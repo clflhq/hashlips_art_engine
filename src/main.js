@@ -313,6 +313,7 @@ const createDna = (_layers) => {
     }
 
     if (elements.length === 0) {
+      console.log("pairLayerMap", pairLayerMap);
       throw new Error(`Can't select trait for ${layer.name}`);
     }
 
@@ -344,6 +345,7 @@ const createDna = (_layers) => {
                   (existValue.pairTraits.length !== pairLayer.pairTraits.length ||
                     existValue.pairTraits.some((trait) => pairLayer.pairTraits.indexOf(trait) === -1))
                 ) {
+                  console.log("pairLayerMap", pairLayerMap);
                   throw new Error(
                     `The pairTrait for ${pairLayer.pairLayerName} is duplicated. layer: ${layer.name}, trait: ${elements[i].name}`
                   );
