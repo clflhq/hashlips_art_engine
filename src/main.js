@@ -118,6 +118,7 @@ const pairLayerValidation = (_checkLayer, _pairLayers, _layersDir) => {
     // excludedTraits存在確認
     checkTraits(pairLayer, "excludedTraits", `${_layersDir}/${pairLayer.pairLayerName}`);
   }
+  return true;
 };
 
 const checkTraits = (_pairLayer, _checkTraits, _layerPath) => {
