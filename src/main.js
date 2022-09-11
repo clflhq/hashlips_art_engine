@@ -86,9 +86,9 @@ const getElements = (path) => {
     });
 };
 
-const layerOptionsSetup = (layersOrder) => {
+const layerOptionsSetup = (_layersOrder) => {
   // layerOrder数分layersをセットアップして、layersの選択肢配列を作成する。
-  const layerOptions = layersOrder.map((value) => ({
+  const layerOptions = _layersOrder.map((value) => ({
     weight: value.weight || 1,
     layers: value.layers.map((layerObj, index) => ({
       id: index,
@@ -97,10 +97,39 @@ const layerOptionsSetup = (layersOrder) => {
       blend: layerObj.options?.["blend"] != undefined ? layerObj.options?.["blend"] : "source-over",
       opacity: layerObj.options?.["opacity"] != undefined ? layerObj.options?.["opacity"] : 1,
       bypassDNA: layerObj.options?.["bypassDNA"] !== undefined ? layerObj.options?.["bypassDNA"] : false,
-      pairLayers: value.pairLayers?.[layerObj.name],
+      pairLayers:
+        value.pairLayers?.[layerObj.name] &&
+        pairLayerValidation(layerObj.name, value.pairLayers[layerObj.name], value.layersDir) &&
+        value.pairLayers[layerObj.name],
     })),
   }));
   return layerOptions;
+};
+
+// 制約をつけているtraitが存在するかどうか確認
+const pairLayerValidation = (_checkLayer, _pairLayers, _layersDir) => {
+  for (pairLayer of _pairLayers) {
+    // targetTraits存在確認
+    checkTraits(pairLayer, "targetTraits", `${_layersDir}/${_checkLayer}`);
+
+    // pairTraits存在確認
+    checkTraits(pairLayer, "pairTraits", `${_layersDir}/${pairLayer.pairLayerName}`);
+
+    // excludedTraits存在確認
+    checkTraits(pairLayer, "excludedTraits", `${_layersDir}/${pairLayer.pairLayerName}`);
+  }
+};
+
+const checkTraits = (_pairLayer, _checkTraits, _layerPath) => {
+  if (!_pairLayer[_checkTraits]) return;
+
+  const elements = getElements(_layerPath);
+  for (trait of _pairLayer[_checkTraits]) {
+    const element = elements.find((value) => value.name === trait);
+    if (!element) {
+      throw new Error(`${trait} doesn't exist: ${_layerPath}/${trait}`);
+    }
+  }
 };
 
 const saveImage = (_editionCount) => {
