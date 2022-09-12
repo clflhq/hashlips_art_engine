@@ -86,9 +86,9 @@ const getElements = (path) => {
     });
 };
 
-const layerOptionsSetup = (layersOrder) => {
+const layerOptionsSetup = (_layersOrder) => {
   // layerOrder数分layersをセットアップして、layersの選択肢配列を作成する。
-  const layerOptions = layersOrder.map((value) => ({
+  const layerOptions = _layersOrder.map((value) => ({
     weight: value.weight || 1,
     layers: value.layers.map((layerObj, index) => ({
       id: index,
@@ -97,10 +97,40 @@ const layerOptionsSetup = (layersOrder) => {
       blend: layerObj.options?.["blend"] != undefined ? layerObj.options?.["blend"] : "source-over",
       opacity: layerObj.options?.["opacity"] != undefined ? layerObj.options?.["opacity"] : 1,
       bypassDNA: layerObj.options?.["bypassDNA"] !== undefined ? layerObj.options?.["bypassDNA"] : false,
-      pairLayers: value.pairLayers?.[layerObj.name],
+      pairLayers:
+        value.pairLayers?.[layerObj.name] &&
+        pairLayerValidation(layerObj.name, value.pairLayers[layerObj.name], value.layersDir) &&
+        value.pairLayers[layerObj.name],
     })),
   }));
   return layerOptions;
+};
+
+// 制約をつけているtraitが存在するかどうか確認
+const pairLayerValidation = (_checkLayer, _pairLayers, _layersDir) => {
+  for (pairLayer of _pairLayers) {
+    // targetTraits存在確認
+    checkTraits(pairLayer, "targetTraits", `${_layersDir}/${_checkLayer}`);
+
+    // pairTraits存在確認
+    checkTraits(pairLayer, "pairTraits", `${_layersDir}/${pairLayer.pairLayerName}`);
+
+    // excludedTraits存在確認
+    checkTraits(pairLayer, "excludedTraits", `${_layersDir}/${pairLayer.pairLayerName}`);
+  }
+  return true;
+};
+
+const checkTraits = (_pairLayer, _checkTraits, _layerPath) => {
+  if (!_pairLayer[_checkTraits]) return;
+
+  const elements = getElements(_layerPath);
+  for (trait of _pairLayer[_checkTraits]) {
+    const element = elements.find((value) => value.name === trait);
+    if (!element) {
+      throw new Error(`${trait} doesn't exist: ${_layerPath}/${trait}`);
+    }
+  }
 };
 
 const saveImage = (_editionCount) => {
@@ -283,6 +313,7 @@ const createDna = (_layers) => {
     }
 
     if (elements.length === 0) {
+      console.log("pairLayerMap", pairLayerMap);
       throw new Error(`Can't select trait for ${layer.name}`);
     }
 
@@ -303,9 +334,9 @@ const createDna = (_layers) => {
               (pairLayer) => pairLayer.targetTraits.includes(elements[i].name) // pairLayers指定のあるtraitsかどうか確認
             )
             .forEach((pairLayer) => {
-              if (pairLayerMap.has(pairLayer.paierLyaerName)) {
+              if (pairLayerMap.has(pairLayer.pairLayerName)) {
                 // すでにmap内にpairLayerが存在する場合は、pairTraitsとexcludedTraitsを追加
-                const existValue = pairLayerMap.get(pairLayer.paierLyaerName);
+                const existValue = pairLayerMap.get(pairLayer.pairLayerName);
 
                 // 同じLayerに対して複数のpairTraitsを設定すると矛盾が生じるのでエラーを返す
                 if (
@@ -314,18 +345,19 @@ const createDna = (_layers) => {
                   (existValue.pairTraits.length !== pairLayer.pairTraits.length ||
                     existValue.pairTraits.some((trait) => pairLayer.pairTraits.indexOf(trait) === -1))
                 ) {
+                  console.log("pairLayerMap", pairLayerMap);
                   throw new Error(
-                    `The pairTrait for ${pairLayer.paierLyaerName} is duplicated. layer: ${layer.name}, trait: ${elements[i].name}`
+                    `The pairTrait for ${pairLayer.pairLayerName} is duplicated. layer: ${layer.name}, trait: ${elements[i].name}`
                   );
                 }
 
-                pairLayerMap.set(pairLayer.paierLyaerName, {
+                pairLayerMap.set(pairLayer.pairLayerName, {
                   pairTraits: [...existValue.pairTraits, ...(pairLayer.pairTraits || [])],
                   excludedTraits: [...existValue.excludedTraits, ...(pairLayer.excludedTraits || [])],
                 });
               } else {
                 // map内にpairLayerが存在しない場合は、pairTraitsとexcludedTraitsを初期化
-                pairLayerMap.set(pairLayer.paierLyaerName, {
+                pairLayerMap.set(pairLayer.pairLayerName, {
                   pairTraits: pairLayer.pairTraits || [],
                   excludedTraits: pairLayer.excludedTraits || [],
                 });
