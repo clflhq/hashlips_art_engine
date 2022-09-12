@@ -19,6 +19,7 @@ for (let i = 0; i < layerConfigurations[0].layersOrder.length; i++) {
 }
 
 data.forEach((item) => {
+  let deleted = false;
   const newAttributes = item.attributes
     .filter((attribute) => {
       if (attribute.trait_type !== integrationLayer1 && attribute.trait_type !== integrationLayer2) {
@@ -31,7 +32,12 @@ data.forEach((item) => {
       }
 
       // integrationLayerかつ、trait名がdeletingTraitNameと一致する場合Layerを削除
-      return attribute.value !== deletingTraitName;
+      if (!deleted && attribute.value === deletingTraitName) {
+        deleted = true;
+        return false;
+      }
+
+      return true;
     })
     .map((attribute) => {
       if (attribute.trait_type === integrationLayer1 || attribute.trait_type === integrationLayer2) {
