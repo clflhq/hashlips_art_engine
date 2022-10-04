@@ -159,24 +159,21 @@ const addMetadata = (_dna, _edition, _selectedLayerOptionIndex) => {
     date: dateTime,
     ...extraMetadata,
     attributes: attributesList,
-    compiler: "HashLips Art Engine",
+    compiler: "Coinfra Labs",
   };
   if (network == NETWORK.sol) {
     tempMetadata = {
       //Added metadata for solana
       name: tempMetadata.name,
-      symbol: solanaMetadata.symbol,
       description: tempMetadata.description,
-      //Added metadata for solana
-      seller_fee_basis_points: solanaMetadata.seller_fee_basis_points,
       image: `${_edition}.png`,
-      //Added metadata for solana
-      external_url: solanaMetadata.external_url,
-      edition: _edition,
-      compiler: solanaMetadata.compiler,
-      collection: solanaMetadata.collection,
+      dna: tempMetadata.dna,
+      edition: tempMetadata.edition,
+      date: tempMetadata.date,
       ...extraMetadata,
       attributes: tempMetadata.attributes,
+      compiler: tempMetadata.compiler,
+      external_url: solanaMetadata.external_url,
       properties: {
         files: [
           {
@@ -184,8 +181,6 @@ const addMetadata = (_dna, _edition, _selectedLayerOptionIndex) => {
             type: "image/png",
           },
         ],
-        category: "image",
-        creators: solanaMetadata.creators,
       },
     };
   }
