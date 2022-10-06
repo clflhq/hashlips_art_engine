@@ -181,6 +181,7 @@ const addMetadata = (_dna, _edition, _selectedLayerOptionIndex) => {
             type: "image/png",
           },
         ],
+        category: "image",
       },
     };
   }
