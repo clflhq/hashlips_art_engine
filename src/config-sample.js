@@ -6,11 +6,11 @@ const network = NETWORK.sol;
 const baseUri = "ipfs://NewUriToReplace";
 
 ///// ↓修正必要箇所↓ /////
-const namePrefix = "Your Collection";
-const description = "Remember to replace this description";
+const namePrefix = "Your Collection"; // NFT名の「〇〇 #15」の〇〇の部分
+const description = "Remember to replace this description"; // プロジェクト概要
 
 const solanaMetadata = {
-  external_url: "https://www.coinfra.io",
+  external_url: "https://www.coinfra.io", // NFTに付与したいサイトのURLがあれば記載
 };
 
 const layerConfigurations = [
@@ -18,7 +18,7 @@ const layerConfigurations = [
     growEditionSizeTo: 10,
     layersOrder: [
       {
-        layersDir: `${basePath}/layers-hogehoge`,
+        layersDir: `${basePath}/layers`, // layerが入っているフォルダパス
         weight: 1, // このlayerOrderの出現率の重さ
         pairLayers: {
           // 特定のlayerでtraitを制限したい場合は以下のように指定する。処理順番の関係上、自分よりも下の階層になるlayerは指定することができない。
@@ -49,7 +49,7 @@ const layerConfigurations = [
         ],
       },
       {
-        layersDir: `${basePath}/layers-hugahuga`,
+        layersDir: `${basePath}/layers`,
         weight: 2,
         layers: [
           { name: "Background" },
@@ -64,11 +64,12 @@ const layerConfigurations = [
     ],
   },
   {
-    growEditionSizeTo: 10,
+    growEditionSizeTo: 15,
     isAllowSameDna: true, // 同じDNAを許容するかのフラグ
+    outputImageSrcPath: `${basePath}/layers/Eyeball/White#50.png`, // 全てのNFTで出力画像が同じ場合は、画像ソースのパスを入力
     layersOrder: [
       {
-        layersDir: `${basePath}/layers-hogehoge-2`,
+        layersDir: `${basePath}/layers`,
         layers: [
           { name: "Background" },
           { name: "Eyeball" },
@@ -89,9 +90,9 @@ const format = {
   height: 512,
   smoothing: false, // ピクセルアートの場合に利用する <参考>https://developer.mozilla.org/ja/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled
 };
-///// ↑修正必要箇所↑ /////
 
-const shuffleLayerConfigurations = false;
+const shuffleLayerConfigurations = true; // layerConfigurationsが複数ある場合それらのindexをシャッフルするかのフラグ
+///// ↑修正必要箇所↑ /////
 
 const debugLogs = false;
 

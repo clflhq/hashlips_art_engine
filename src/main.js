@@ -40,6 +40,9 @@ const buildSetup = () => {
   }
   fs.mkdirSync(buildDir);
   fs.mkdirSync(`${buildDir}/assets-${project}`);
+  for (let i = 0; i < layerConfigurations.length; i++) {
+    fs.mkdirSync(`${buildDir}/layerConfig-${i}`);
+  }
   if (gif.export) {
     fs.mkdirSync(`${buildDir}/gifs`);
   }
@@ -430,6 +433,7 @@ const startCreating = async () => {
   while (layerConfigIndex < layerConfigurations.length) {
     const layerOptions = layerOptionsSetup(layerConfigurations[layerConfigIndex].layersOrder);
 
+    metadataListPerLayerOrder = [];
     // layerOptionsの数分空配列で初期化
     for (let i = 0; i < layerOptions.length; i++) {
       metadataListPerLayerOrder[i] = [];
@@ -438,16 +442,26 @@ const startCreating = async () => {
     while (editionCount <= layerConfigurations[layerConfigIndex].growEditionSizeTo) {
       const { layers, selectedLayerOptionIndex } = selectlayerOption(layerOptions);
 
-      let newDna = createDna(layers);
+      const newDna = createDna(layers);
       if (isDnaUnique(dnaList, newDna) || layerConfigurations[layerConfigIndex].isAllowSameDna) {
-        let results = constructLayerToDna(newDna, layers);
-        let loadedElements = [];
+        const results = constructLayerToDna(newDna, layers);
 
-        results.forEach((layer) => {
-          loadedElements.push(loadLayerImg(layer));
-        });
+        // outputImageSrcPathが定義されている場合はImageSrcをコピーする
+        if (layerConfigurations[layerConfigIndex].outputImageSrcPath) {
+          results.forEach((layer) => {
+            addAttributes({ layer });
+          });
+          fs.copyFileSync(
+            layerConfigurations[layerConfigIndex].outputImageSrcPath,
+            `${buildDir}/assets-${project}/${abstractedIndexes[0]}.png`
+          );
+        } else {
+          const loadedElements = [];
 
-        await Promise.all(loadedElements).then((renderObjectArray) => {
+          results.forEach((layer) => {
+            loadedElements.push(loadLayerImg(layer));
+          });
+          const renderObjectArray = await Promise.all(loadedElements);
           debugLogs ? console.log("Clearing canvas") : null;
           ctx.clearRect(0, 0, format.width, format.height);
           if (gif.export) {
@@ -476,10 +490,12 @@ const startCreating = async () => {
           }
           debugLogs ? console.log("Editions left to create: ", abstractedIndexes) : null;
           saveImage(abstractedIndexes[0]);
-          addMetadata(newDna, abstractedIndexes[0], selectedLayerOptionIndex);
-          saveMetaDataSingleFile(abstractedIndexes[0]);
-          console.log(`Created edition: ${abstractedIndexes[0]}, with DNA: ${sha1(newDna)}`);
-        });
+        }
+
+        addMetadata(newDna, abstractedIndexes[0], selectedLayerOptionIndex);
+        saveMetaDataSingleFile(abstractedIndexes[0]);
+        console.log(`Created edition: ${abstractedIndexes[0]}, with DNA: ${sha1(newDna)}, Created: ${editionCount}`);
+
         dnaList.add(filterDNAOptions(newDna));
         editionCount++;
         abstractedIndexes.shift();
@@ -497,7 +513,10 @@ const startCreating = async () => {
 
     // layerOptionごとのmetadataを出力
     metadataListPerLayerOrder.forEach((metadataList, index) => {
-      fs.writeFileSync(`${buildDir}/_metadata-${index}.json`, JSON.stringify(metadataList, null, 2));
+      fs.writeFileSync(
+        `${buildDir}/layerConfig-${layerConfigIndex}/_metadata-${index}.json`,
+        JSON.stringify(metadataList, null, 2)
+      );
     });
 
     layerConfigIndex++;
