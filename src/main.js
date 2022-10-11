@@ -29,7 +29,7 @@ var metadataList = [];
 var metadataListPerLayerOrder = []; // LayerOrderごとのmetadataList。rarity.jsで利用する。
 var attributesList = [];
 var dnaList = new Set();
-const DNA_DELIMITER = "="; // もしtrait名に"=" or "."が入る場合は考慮が必要
+const DNA_DELIMITER = "--"; // もしtrait名に"--" or "."が入る場合は考慮が必要
 const HashlipsGiffer = require(`${basePath}/modules/HashlipsGiffer.js`);
 
 let hashlipsGiffer = null;
@@ -439,7 +439,7 @@ const startCreating = async () => {
       const { layers, selectedLayerOptionIndex } = selectlayerOption(layerOptions);
 
       let newDna = createDna(layers);
-      if (isDnaUnique(dnaList, newDna)) {
+      if (isDnaUnique(dnaList, newDna) || layerConfigurations[layerConfigIndex].isAllowSameDna) {
         let results = constructLayerToDna(newDna, layers);
         let loadedElements = [];
 

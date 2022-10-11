@@ -63,6 +63,24 @@ const layerConfigurations = [
       },
     ],
   },
+  {
+    growEditionSizeTo: 10,
+    isAllowSameDna: true, // 同じDNAを許容するかのフラグ
+    layersOrder: [
+      {
+        layersDir: `${basePath}/layers-hogehoge-2`,
+        layers: [
+          { name: "Background" },
+          { name: "Eyeball" },
+          { name: "Eye color" },
+          { name: "Iris" },
+          { name: "Shine" },
+          { name: "Bottom lid" },
+          { name: "Top lid" },
+        ],
+      },
+    ],
+  },
 ];
 
 const format = {
