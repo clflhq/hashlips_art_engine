@@ -66,7 +66,7 @@ const layerConfigurations = [
   {
     growEditionSizeTo: 15,
     isAllowSameDna: true, // 同じDNAを許容するかのフラグ
-    outputImageSrcPath: `${basePath}/layers/Eyeball/White#50.png`, // 全てのNFTで出力画像が同じ場合は、画像ソースのパスを入力
+    outputImageSrcLayer: "Eyeball", // 全てのNFTで出力画像が同じ場合は、画像ソースのLayer名を入力
     layersOrder: [
       {
         layersDir: `${basePath}/layers`,

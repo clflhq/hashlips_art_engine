@@ -447,15 +447,15 @@ const startCreating = async () => {
       if (isDnaUnique(dnaList, newDna) || layerConfigurations[layerConfigIndex].isAllowSameDna) {
         const results = constructLayerToDna(newDna, layers);
 
-        // outputImageSrcPathが定義されている場合はImageSrcをコピーする
-        if (layerConfigurations[layerConfigIndex].outputImageSrcPath) {
+        // outputImageSrcLayerが定義されている場合はImageSrcをコピーする
+        if (layerConfigurations[layerConfigIndex].outputImageSrcLayer) {
           results.forEach((layer) => {
             addAttributes({ layer });
           });
-          fs.copyFileSync(
-            layerConfigurations[layerConfigIndex].outputImageSrcPath,
-            `${buildDir}/assets-${project}/${abstractedIndexes[0]}.png`
-          );
+          const outputImageSrcPath = results.find(
+            (result) => result.name === layerConfigurations[layerConfigIndex].outputImageSrcLayer
+          ).selectedElement.path;
+          fs.copyFileSync(outputImageSrcPath, `${buildDir}/assets-${project}/${abstractedIndexes[0]}.png`);
         } else {
           const loadedElements = [];
 
