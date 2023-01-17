@@ -300,7 +300,7 @@ const createDna = (_layers, index) => {
     let elements = layer.elements;
 
     // TODO: robotic swords用のコード 対応終了後に削除
-    if (index <= 42 && layer.name === "Wings") {
+    if (index <= 39 && layer.name === "Wings") {
       elements = elements.filter((element) => element.name === "Acid" || element.name === "Cheetah");
     }
 
