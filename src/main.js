@@ -293,11 +293,16 @@ const isDnaUnique = (_DnaList = new Set(), _dna = "") => {
   return !_DnaList.has(_filteredDNA);
 };
 
-const createDna = (_layers) => {
+const createDna = (_layers, index) => {
   let randNum = [];
   let pairLayerMap = new Map(); // キー: pairLayerのレイヤー名、value: { pairTraits: ペアになるtrait配列, excludedTraits: 除外するtrait配列 } を保持するマップ
   _layers.forEach((layer) => {
     let elements = layer.elements;
+
+    // TODO: robotic swords用のコード 対応終了後に削除
+    if (index <= 42 && layer.name === "Wings") {
+      elements = elements.filter((element) => element.name === "Acid" || element.name === "Cheetah");
+    }
 
     // pairLayerに該当するか確認し、該当する場合はペアになるtraitsを抽出
     if (pairLayerMap.has(layer.name)) {
@@ -443,7 +448,7 @@ const startCreating = async () => {
     while (editionCount <= layerConfigurations[layerConfigIndex].growEditionSizeTo) {
       const { layers, selectedLayerOptionIndex } = selectlayerOption(layerOptions);
 
-      const newDna = createDna(layers);
+      const newDna = createDna(layers, abstractedIndexes[0]);
       if (isDnaUnique(dnaList, newDna) || layerConfigurations[layerConfigIndex].isAllowSameDna) {
         const results = constructLayerToDna(newDna, layers);
 
