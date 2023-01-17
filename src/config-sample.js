@@ -91,7 +91,7 @@ const format = {
   smoothing: false, // ピクセルアートの場合に利用する <参考>https://developer.mozilla.org/ja/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled
 };
 
-const shuffleLayerConfigurations = true; // layerConfigurationsが複数ある場合それらのindexをシャッフルするかのフラグ
+const shuffleLayerConfigurations = false; // layerConfigurationsが複数ある場合それらのindexをシャッフルするかのフラグ
 ///// ↑修正必要箇所↑ /////
 
 const debugLogs = false;
